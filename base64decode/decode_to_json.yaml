@@ -1,0 +1,24 @@
+---
+- name: Decode base64 customer info from JSON payload
+  hosts: localhost
+  gather_facts: false
+  vars:
+    # Example input JSON payload with base64-encoded fields
+    encoded_payload:
+      customer_name: "UGF1bG8gTWVub24="   # "Paulo Menon" base64 encoded
+      email: "cG1lbm9uaW5zaWdodHNAZ21haWwuY29t"  # "pmenoninsights@gmail.com" base64 encoded
+
+  tasks:
+    - name: Decode customer_name from base64
+      set_fact:
+        decoded_customer_name: "{{ encoded_payload.customer_name | b64decode }}"
+
+    - name: Decode email from base64
+      set_fact:
+        decoded_email: "{{ encoded_payload.email | b64decode }}"
+
+    - name: Show decoded JSON payload
+      debug:
+        msg:
+          customer_name: "{{ decoded_customer_name }}"
+          email: "{{ decoded_email }}"

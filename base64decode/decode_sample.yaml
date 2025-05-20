@@ -1,0 +1,32 @@
+---
+- hosts: localhost
+  vars:
+    encoded_content: "YmFuYW5hDQphcHBsZQ0Kb3JhZ2UNCg=="
+    result: ""
+    array_1: 
+      - value1
+      - value2
+      - value3
+      - value4
+  tasks:
+
+    - name: Decode base64-encoded content
+      set_fact:
+        result: "{{ encoded_content | b64decode }}"
+    
+    - name: Display
+      debug:
+        msg: "{{ result }}"
+
+    - name: Split decoded content into array
+      set_fact:
+        content_array: "{{ result | regex_replace('\\r\\n',',')| split(',') | select('truthy') | list  }}"
+    
+    - name: Display array
+      debug:
+        msg: "{{ content_array[item] }}"
+      loop: "{{ range(0,content_array | length ) }}"
+    
+    - name: Command line test
+      ansible.builtin.command: who am i
+      register: command_result  

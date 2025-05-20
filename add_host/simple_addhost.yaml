@@ -1,0 +1,21 @@
+- name: Add a new host dynamically
+  hosts: localhost
+  gather_facts: no
+
+  tasks:
+    - ansible.builtin.add_host:
+        name: newhost.example.com
+        ansible_host: newhost.example.com
+        ansible_user: myuser
+        ansible_password: mypassword
+        groups: myvirtual_host
+
+# Different play using the virtual/in memory added host
+- name: Run task on new target host 
+  hosts: myvirtal_host
+  gather_facts: no
+
+  tasks:
+    #- ping:
+
+    - ansible.builtin.debug: var=ansible_host

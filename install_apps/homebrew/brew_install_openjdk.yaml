@@ -1,0 +1,32 @@
+---
+- name: Install OpenJDK 1.8 on macOS
+  hosts: localhost
+  gather_facts: yes
+  become: false
+
+  tasks:
+    - name: Ensure Homebrew is installed
+      stat:
+        path: /usr/local/bin/brew
+      register: homebrew_check
+      when: ansible_facts['os_family'] == "Darwin"
+
+    # Install OpenJDK with a specific version using Homebrew
+    - name: Install OpenJDK 1.17 (openjdk@17) using Homebrew
+      community.general.homebrew:
+        name: openjdk@17
+        state: present
+      when: homebrew_check.stat.exists
+
+#   Install latest OpenJDK using Homebrew
+#    - name: Install latest OpenJDK using Homebrew
+#      community.general.homebrew:
+#        name: openjdk
+#        state: latest
+#      when: homebrew_check.stat.exists
+
+    - name: Set JAVA_HOME environment variable
+      shell: |
+        echo 'export JAVA_HOME="$(/usr/libexec/java_home -v 1.8)"' >> ~/.bash_profile
+        source ~/.bash_profile
+      when: homebrew_check.stat.exists

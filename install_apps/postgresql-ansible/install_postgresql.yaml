@@ -1,0 +1,59 @@
+- name: Install PostgreSQL locally (Linux or macOS)
+  hosts: localhost
+  become: false
+  gather_facts: yes
+  tasks:
+    
+    - name: Ensuring Homebrew Is Installed
+      stat:
+          path: /usr/local/bin/brew
+      register: homebrew_check
+      when: ansible_facts['os_family'] == "Darwin"
+    
+    - name: Debug Homebrew Check
+      debug:
+        msg: "Homebrew is installed"
+      when: homebrew_check.stat.exists
+    
+    - name: Install PostgreSQL postgresql@17 on macOS with Homebrew
+      homebrew:
+        name: postgresql@17
+        state: present
+      when: homebrew_check.stat.exists
+ 
+    - name: Check PostgreSQL version
+      command: psql-17 --version
+      register: psql_version
+      when: homebrew_check.stat.exists
+
+    - name: Display PostgreSQL version
+      debug:
+        msg: "PostgreSQL version: {{ psql_version.stdout }}"
+      when: homebrew_check.stat.exists
+
+#    - name: Start PostgreSQL service (macOS only)
+#      homebrew_services: 
+#        name: postgresql
+#        state: started
+#      when: homebrew_check.stat.exists
+
+    - name: Install PostgreSQL on Debian/Ubuntu
+      apt:
+        name: postgresql
+        state: present
+        update_cache: yes
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Install PostgreSQL on RedHat/CentOS
+      yum:
+        name: postgresql-server
+        state: present
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Start PostgreSQL service (Linux only)
+      service:
+        name: postgresql
+        state: started
+        enabled: yes
+      when: homebrew_check.stat.exists != true
+

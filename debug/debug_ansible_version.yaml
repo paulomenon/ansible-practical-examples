@@ -1,0 +1,29 @@
+- name: Install PostgreSQL locally (Linux or macOS)
+  hosts: localhost
+  gather_facts: no
+  
+  tasks:
+
+    - name: Get List Local collections
+      ansible.builtin.shell:
+        cmd: ansible-galaxy collection list
+      delegate_to: localhost
+      become: no
+      register: galaxy_cmd_result
+
+    - name: Display galaxy command
+      ansible.builtin.debug:
+        var: galaxy_cmd_result.stdout
+
+    - name: Get Ansible version
+      ansible.builtin.shell:
+        cmd: ansible --version
+      delegate_to: localhost
+      become: no
+      register: ansible_cmd_result
+
+    - name: Display ansible version
+      ansible.builtin.debug:
+        var: ansible_cmd_result.stdout
+
+    - ansible.builtin.debug: var=ansible_host
