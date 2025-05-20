@@ -1,0 +1,35 @@
+---
+- name: Zos ping example
+  hosts: target_hosts
+  gather_facts: no
+
+
+  collections:
+    - ibm.ibm_zos_core
+
+  vars:
+    ansible_python_interpreter: /user/bin/python3 # chabge to your python path
+
+  # environment variables for zos ansible example taken from https://github.com/ansible-collections/ibm_zos_core/blob/dev/README.md
+  # and you need to check your system running this mainframe command: env or printenv 
+  environment:
+    _BPXK_AUTOCVT: "ON"
+    ZOAU_HOME: "/usr/lpp/IBM/zoautil"
+    LIBPATH: "/opt/IBM/zos-ansible/lib"
+    PYTHONPATH: "/opt/IBM/zos-ansible/lib/python3.8/site-packages"
+    PATH: "/usr/lpp/IBM/zos-ansible/bin:/usr/lpp/IBM/zoautil/bin:/usr/lpp/IBM/zos-ansible/lib/python3.8/site-packages"
+    _CEE_RUNOPTS: "FILETAG(AUTOCVT,AUTOTAG) POSIX(ON)"
+    _TAG_REDIR_ERR: txt
+    _TAG_REDIR_IN: txt
+    _TAG_REDIR_OUT: txt
+    LANG: C
+    PYTHONSTDINENCODING: cp1047   #ISO8859-1 or IBM-1047 or UTF-8 you need to check your system
+
+  tasks:
+    - name: Zos ping partition 
+      ibm.ibm_zos_core.zos_ping:
+      register: result
+
+    - name: Display result
+      ansible.builtin.debug:
+        msg: "{{ result }}"

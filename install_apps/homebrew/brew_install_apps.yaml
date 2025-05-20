@@ -1,3 +1,8 @@
+---
+# This playbook demonstrates how to add a host dynamically to the inventory
+# and then run a task on that host.
+# It uses the `ansible.builtin.add_host` module to add a new host with
+# specific parameters like `ansible_host`, `ansible_user`, and `ansible_password`.
 - name: Install Apps locally on macOS using Homebrew
   hosts: localhost
   become: false

@@ -1,3 +1,4 @@
+---
 - name: Add a new host dynamically
   hosts: localhost
   gather_facts: no

@@ -1,0 +1,24 @@
+---
+- name: Retrieve a CyberArk credential using clipasswordsdk
+  hosts: localhost
+  gather_facts: false
+  vars:
+    cyberark_appid: MyAppID
+    cyberark_safe: MySafe
+    cyberark_object: MyObject
+    cybberark_folder: MyFolder
+
+  tasks:
+    - name: Run clipasswordsdk to get password
+      shell: >
+        clipasswordsdk GetPassword
+        -p AppDescs.AppID={{ cyberark_appid }}
+        -p Query="Safe={{ cyberark_safe }};folder={{ cyberark_folder }};Object={{ cyberark_object }}"
+        -o Content
+      register: clipass_result
+      no_log: true  # Prevents password from appearing in logs
+
+    - name: Display password (remove in production)
+      debug:
+        msg: "Retrieved password: {{ clipass_result.stdout }}"
+      when: clipass_result.stdout is defined

@@ -1,0 +1,29 @@
+---
+- name: Configure network interface with multiple IPs
+  hosts: myhosts
+  become: yes
+  vars:
+    interface_name: eth0
+    ip_addresses:
+      - 192.168.10.10/24
+      - 192.168.10.11/24
+      - 192.168.10.12/24
+
+  tasks:
+    - name: Add primary IP address
+      ansible.builtin.command: nmcli connection modify "{{ interface_name }}" ipv4.addresses "{{ ip_addresses[0] }}" ipv4.method manual
+      register: nmcli_modify_primary
+
+    - name: Add secondary IP addresses
+      ansible.builtin.command: >
+        nmcli connection modify "{{ interface_name }}"
+        +ipv4.addresses "{{ item }}"
+      loop: "{{ ip_addresses[1:] }}"
+
+    - name: Bring the interface down
+      ansible.builtin.command: nmcli connection down "{{ interface_name }}"
+      when: nmcli_modify_primary.changed
+
+    - name: Bring the interface up
+      ansible.builtin.command: nmcli connection up "{{ interface_name }}"
+      when: nmcli_modify_primary.changed

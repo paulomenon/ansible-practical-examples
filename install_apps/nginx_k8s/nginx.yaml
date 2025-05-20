@@ -1,0 +1,62 @@
+---
+- name: Install Nginx on Kubernetes
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Create Nginx Deployment
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: nginx-deployment
+            namespace: default
+          spec:
+            replicas: 2
+            selector:
+              matchLabels:
+                app: nginx
+            template:
+              metadata:
+                labels:
+                  app: nginx
+              spec:
+                containers:
+                  - name: nginx
+                    image: nginx:latest
+                    ports:
+                      - containerPort: 80
+
+    - name: Create Nginx Service
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: nginx-service
+            namespace: default
+          spec:
+            type: NodePort
+            ports:
+              - port: 80
+                targetPort: 80
+                nodePort: 30080 # Optional, specify a port if needed.
+            selector:
+              app: nginx
+
+    - name: Wait for Nginx Pods to be ready
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: default
+        label_selectors:
+          - app=nginx
+      register: nginx_pods
+
+    - name: Wait for Nginx Pods to be running and ready
+      wait_for_condition:
+        condition: "'Running' in item.status.phase"
+        delay: 5
+        retries: 10
+      loop: "{{ nginx_pods.resources }}"
