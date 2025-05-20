@@ -1,0 +1,44 @@
+---
+- name: Install Argo CD in Kubernetes using Ansible
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - community.kubernetes
+
+  vars:
+    argocd_namespace: argocd
+    argocd_manifest_url: https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+  tasks:
+    - name: Create Argo CD namespace
+      k8s:
+        api_version: v1
+        kind: Namespace
+        name: "{{ argocd_namespace }}"
+        state: present
+
+    - name: Download Argo CD manifest
+      get_url:
+        url: "{{ argocd_manifest_url }}"
+        dest: /tmp/argocd-install.yaml
+
+    - name: Apply Argo CD manifest
+      k8s:
+        state: present
+        namespace: "{{ argocd_namespace }}"
+        src: /tmp/argocd-install.yaml
+
+    - name: Wait for Argo CD pods to be ready
+      k8s_info:
+        kind: Pod
+        namespace: "{{ argocd_namespace }}"
+      register: argocd_pods
+      until: argocd_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length >= 5
+      retries: 10
+      delay: 15
+
+    - name: Show Argo CD pod names
+      debug:
+        msg: "{{ item.metadata.name }}"
+      loop: "{{ argocd_pods.resources }}"
+      when: item.status.phase == 'Running'
