@@ -82,4 +82,5 @@ These examples demonstrate practical Ansible tasks you might encounter in daily 
 - Practical Jinga2 Templates
 - Security updates and patches
 
-Explore the [examples directory](./examples) for detailed playbooks and documentation.
+Explore the [examples directory](./examples) for simple examples and the [day-to-day-work-examples] for detailed playbooks and documentation.
+
