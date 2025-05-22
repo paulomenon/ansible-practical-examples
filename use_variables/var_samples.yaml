@@ -1,0 +1,24 @@
+---
+- name: Local Var Samples
+  hosts: localhost
+  gather_facts: no
+
+  vars:
+    username: "pmenon"
+    uid_number: 1001
+    gid_number: 1001
+    user_email: "pmenoninsights@gmail.com"
+
+  tasks:
+    - name: Display Ansible version
+      ansible.builtin.debug:
+        msg: "Ansible version is {{ ansible_version.full }}"
+    
+    - name: Display var username
+      ansible.builtin.debug:
+        msg: "Username is {{ username }} and uid_number is {{ uid_number }}"
+      
+    - name: Display var user_email
+      ansible.builtin.debug:
+        msg: "User email is {{ user_email }}"
+  

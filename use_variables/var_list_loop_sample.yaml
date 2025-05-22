@@ -1,0 +1,18 @@
+---
+- name: Display list of IP addresses
+  hosts: localhost
+  gather_facts: no
+
+  vars:
+    ip_addresses:
+      - "192.168.1.10"
+      - "10.0.0.5"
+      - "172.16.0.1"
+      - "8.8.8.8"
+      - "127.0.0.1"
+
+  tasks:
+    - name: Display each IP address
+      ansible.builtin.debug:
+        msg: "IP address: {{ item }}"
+      loop: "{{ ip_addresses }}"

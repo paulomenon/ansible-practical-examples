@@ -1,0 +1,29 @@
+---
+- name: Display Ansible Variables
+  hosts: localhost
+  gather_facts: no
+
+  tasks:
+    - name: Display Ansible version
+      ansible.builtin.debug:
+        msg: "Ansible version is {{ ansible_version.full }}"
+
+    - name: Display ansible_host variable
+      ansible.builtin.debug:
+        var: ansible_host
+
+    - name: Display ansible_user variable
+      ansible.builtin.debug:
+        var: ansible_user
+
+    - name: Display ansible_password variable
+      ansible.builtin.debug:
+        var: ansible_password
+
+    - name: Display ansible_port variable
+      ansible.builtin.debug:
+        var: ansible_port
+        
+    - name: Display ansible_connection variable
+      ansible.builtin.debug:
+        var: ansible_connection
