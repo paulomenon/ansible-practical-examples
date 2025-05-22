@@ -65,9 +65,13 @@ These examples cover the fundamental concepts of Ansible, including:
 - Setting up your first playbook
 - Use Variables and Passing extra vars via command line
 - Managing users and groups
-- Installing packages
+- Installing Apps/Softwares
 - Copying files
 - Basic Jinga2 Templates
+- LDAP
+- CyberArk
+- Network
+- Zos IBM Mainframe
 
 ### Day-to-Day Work Examples
 
@@ -82,5 +86,5 @@ These examples demonstrate practical Ansible tasks you might encounter in daily 
 - Practical Jinga2 Templates
 - Security updates and patches
 
-Explore the [examples directory](./examples) for simple examples and the [day-to-day-work-examples] for detailed playbooks and documentation.
+Explore the [examples directory](./examples) for simple examples and the [day-to-day-work-examples](./day-to-day-work-examples) for detailed playbooks and documentation.
 
