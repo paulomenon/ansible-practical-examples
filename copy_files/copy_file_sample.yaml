@@ -1,0 +1,13 @@
+---
+- name: Copy a file from one location to another
+  hosts: localhost
+  gather_facts: no
+
+  tasks:
+    - name: Copy file from /tmp/source.txt to /home/user/destination.txt
+      ansible.builtin.copy:
+        src: tmp/source.txt
+        dest: destination/destination.txt
+     #   owner: user
+     #   group: user
+     #   mode: '0644'
