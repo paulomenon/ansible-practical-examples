@@ -1,0 +1,40 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ egress_policy_name }}
+  namespace: {{ namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      {{ egress_pod_selector_key }}: {{ egress_pod_selector_value }}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        {% for rule in egress_to_rules %}
+        - {% if rule.pod_selector %}
+          podSelector:
+            matchLabels:
+              {{ rule.pod_selector.key }}: {{ rule.pod_selector.value }}
+          {% endif %}
+          {% if rule.namespace_selector %}
+          namespaceSelector:
+            matchLabels:
+              {{ rule.namespace_selector.key }}: {{ rule.namespace_selector.value }}
+          {% endif %}
+          {% if rule.ip_block %}
+          ipBlock:
+            cidr: {{ rule.ip_block.cidr }}
+            {% if rule.ip_block.except %}
+            except:
+              {% for ex in rule.ip_block.except %}
+              - {{ ex }}
+              {% endfor %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      ports:
+        {% for port in egress_ports %}
+        - protocol: {{ port.protocol }}
+          port: {{ port.number }}
+        {% endfor %}

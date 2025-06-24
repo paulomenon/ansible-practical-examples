@@ -1,0 +1,24 @@
+- name: Apply Egress NetworkPolicy
+  hosts: localhost
+  gather_facts: no
+
+  collections:
+    - kubernetes.core
+
+  vars_files:
+    - vars/egress_vars.yml
+  
+  tasks:
+    - name: Generate Egress Policy from template
+      template:
+        src: egress.yaml.j2
+        dest: /tmp/egress_policy.yaml
+
+    - name: Apply Egress NetworkPolicy
+      kubernetes.core.k8s:
+        state: present
+        src: /tmp/egress_policy.yaml
+    
+    #- name: Debug Egress Policy
+    #  debug:
+    #    msg: "Egress NetworkPolicy applied successfully from /tmp/egress_policy.yaml"   

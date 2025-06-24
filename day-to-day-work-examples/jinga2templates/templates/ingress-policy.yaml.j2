@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ ingress_policy_name }}
+  namespace: {{ namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      {{ ingress_pod_selector_key }}: {{ ingress_pod_selector_value }}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        {% for rule in ingress_from_rules %}
+        - {% if rule.pod_selector %}
+          podSelector:
+            matchLabels:
+              {{ rule.pod_selector.key }}: {{ rule.pod_selector.value }}
+          {% endif %}
+          {% if rule.namespace_selector %}
+          namespaceSelector:
+            matchLabels:
+              {{ rule.namespace_selector.key }}: {{ rule.namespace_selector.value }}
+          {% endif %}
+        {% endfor %}
+      ports:
+        {% for port in ingress_ports %}
+        - protocol: {{ port.protocol }}
+          port: {{ port.number }}
+        {% endfor %}

@@ -1,0 +1,19 @@
+- name: Apply Ingress NetworkPolicy
+  hosts: localhost
+  gather_facts: no
+
+  collections:
+    - kubernetes.core
+    
+  vars_files:
+    - ingress_vars.yml
+  tasks:
+    - name: Generate Ingress Policy from template
+      template:
+        src: ingress.yaml.j2
+        dest: /tmp/ingress_policy.yaml
+
+    - name: Apply Ingress NetworkPolicy
+      kubernetes.core.k8s:
+        state: present
+        src: /tmp/ingress_policy.yaml

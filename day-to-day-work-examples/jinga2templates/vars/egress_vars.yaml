@@ -1,0 +1,17 @@
+egress_policy_name: allow-outbound-dns
+namespace: my-app
+egress_pod_selector_key: app
+egress_pod_selector_value: backend
+
+egress_to_rules:
+  - ip_block:
+      cidr: 0.0.0.0/0
+      except:
+        - 10.0.0.0/8
+  - pod_selector:
+      key: role
+      value: dns
+
+egress_ports:
+  - protocol: UDP
+    number: 53
