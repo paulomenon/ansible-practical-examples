@@ -1,0 +1,23 @@
+---
+- name: Add new user to LDAP
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Add user to LDAP
+      ldap_user:
+        dn: "uid={{ username }},ou=users,dc=example,dc=com"
+        state: present
+        attributes:
+          cn: "{{ username }}"
+          sn: "{{ username }}"
+          mail: "{{ username }}@example.com"
+          uidNumber: "{{ uid_number }}"
+          gidNumber: "{{ gid_number }}"
+          homeDirectory: "/home/{{ username }}"
+          loginShell: "/bin/bash"
+      register: ldap_user_result
+
+    - name: Display result
+      debug:
+        var: ldap_user_result
+      when: ldap_user_result is defined
