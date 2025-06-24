@@ -1,0 +1,28 @@
+---
+- name: Copy file to remote servers
+  hosts: localhost
+  vars:
+    file_content: "Text goes here! Horray"
+    file_name: "different_file"
+    
+  tasks:
+    - name: Render my jinga2 template
+      ansible.builtin.template:
+        src: templates/my_file_template.j2
+        dest: "{{file_name}}.txt"
+
+    - name: Print commands
+      ansible.builtin.shell:
+        cmd: "pwd"
+      register: results
+
+    - name: Debug
+      debug: 
+        var: results
+        
+    - name: Print commands pwd and whoami
+      ansible.builtin.shell:
+        cmd: |
+          echo "Current directory: $(pwd)"
+          echo "Current user: $(whoami)"
+      delegate_to: "{{ new_host_name }}"
