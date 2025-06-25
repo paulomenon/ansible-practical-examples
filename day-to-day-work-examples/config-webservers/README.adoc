@@ -1,0 +1,40 @@
+# Apache Example
+
+# This is a template for a virtual host configuration file for Apache HTTP Server.
+
+# Example how to run this playbook:
+
+```bash 
+ansible-playbook httpd_rhel.yaml -e "vhost_port=8080"
+```
+
+# This will set the virtual host to listen on port 8080 instead of the default port 80.
+
+# Nginx Example 
+
+## Ngixg OpenShift
+
+**nginx_openshift** uses jinja2 templates to create the configuration files for nginx. 
+
+It allows for more flexibility and customization compared to static configuration files. 
+
+It also uses kubernetes core collection to manage the nginx deployment in OpenShift.
+
+# Example how to run this playbook:
+
+```bash
+ansible-playbook nginx_openshift.yml -e "nginx_port=8080"
+```
+# This will set the nginx deployment to listen on port 8080 instead of the default port 80.
+
+## Nginx RHEL
+
+gnixg_rhel uses a static configuration file for nginx.
+
+# Example how to run this playbook:
+
+```bash
+ansible-playbook nginx_rhel.yaml -e "nginx_port=8080"
+```
+# This will set the nginx server to listen on port 8080 instead of the default port 80.
+

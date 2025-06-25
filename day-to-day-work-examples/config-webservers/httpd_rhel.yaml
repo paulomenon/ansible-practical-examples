@@ -1,0 +1,45 @@
+---
+- name: Install and configure HTTPD with dynamic VirtualHost on RHEL
+  hosts: rhel_servers
+  become: yes
+
+  vars:
+    httpd_conf_path: /etc/httpd/conf/httpd.conf
+    vhost_port: 8080
+    vhost_template_dest: /etc/httpd/conf/httpd.conf  # Overwrite main config
+
+  tasks:
+    - name: Install httpd
+      yum:
+        name: httpd
+        state: present
+
+    - name: Ensure httpd is started and enabled
+      systemd:
+        name: httpd
+        state: started
+        enabled: yes
+
+    - name: Backup original httpd.conf
+      copy:
+        src: "{{ httpd_conf_path }}"
+        dest: "{{ httpd_conf_path }}.bak"
+        remote_src: yes
+
+    - name: Deploy httpd.conf with VirtualHost using Jinja2 template
+      template:
+        src: templates/vhost.conf.j2
+        dest: "{{ vhost_template_dest }}"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Restart httpd to apply new configuration
+      systemd:
+        name: httpd
+        state: restarted
+        
+    # Uncomment the following tasks if SELinux is applicable and needs to be configured
+    #- name: Ensure SELinux is set to permissive mode (if applicable)
+    #  selinux:
+    #    state: permissive 

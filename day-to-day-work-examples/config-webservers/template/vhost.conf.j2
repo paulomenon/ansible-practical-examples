@@ -1,0 +1,29 @@
+# This is a template for a virtual host configuration file for Apache HTTP Server.
+Listen {{ vhost_port }}
+
+ServerRoot "/etc/httpd"
+PidFile run/httpd.pid
+Timeout 60
+User apache
+Group apache
+ServerAdmin root@localhost
+DocumentRoot "/var/www/html"
+
+<Directory "/var/www">
+    AllowOverride None
+    Require all granted
+</Directory>
+
+<VirtualHost *:{{ vhost_port }}>
+    DocumentRoot "/var/www/html"
+    ServerName www.example.com
+
+    <Directory "/var/www/html">
+        AllowOverride None
+        Require all granted
+    </Directory>
+
+    ErrorLog logs/vhost-{{ vhost_port }}-error_log
+    CustomLog logs/vhost-{{ vhost_port }}-access_log common
+</VirtualHost>
+# Additional configuration can be added here
