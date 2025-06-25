@@ -1,0 +1,77 @@
+# nginx_openshift.yml
+---
+- name: Deploy NGINX on OpenShift
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  collections:
+    - kubernetes.core
+
+  vars:
+    namespace: nginx-demo
+    nginx_image: nginx:latest
+    app_name: nginx-app
+
+  tasks:
+    - name: Create project (namespace)
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: "{{ namespace }}"
+        state: present
+
+    - name: Deploy NGINX pod and service
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: "{{ app_name }}"
+            namespace: "{{ namespace }}"
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: "{{ app_name }}"
+            template:
+              metadata:
+                labels:
+                  app: "{{ app_name }}"
+              spec:
+                containers:
+                  - name: nginx
+                    image: "{{ nginx_image }}"
+                    ports:
+                      - containerPort: 80
+
+    - name: Expose NGINX via service
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: "{{ app_name }}-svc"
+            namespace: "{{ namespace }}"
+          spec:
+            selector:
+              app: "{{ app_name }}"
+            ports:
+              - protocol: TCP
+                port: 80
+                targetPort: 80
+            type: ClusterIP
+            
+    - name: Wait for NGINX pod to be ready
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: "{{ namespace }}"
+        label_selectors:
+          - app="{{ app_name }}"
+      register: nginx_pods  
+
+    - name: Display NGINX pod status
+      debug:
+        msg: "NGINX pod is ready: {{ nginx_pods.resources[0].status.phase }}" 

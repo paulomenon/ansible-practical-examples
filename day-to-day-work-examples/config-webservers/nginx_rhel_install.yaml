@@ -1,0 +1,28 @@
+---
+- name: Install and configure NGINX on RHEL
+  hosts: rhel_servers
+  become: true
+  tasks:
+    - name: Install EPEL repository
+      yum:
+        name: epel-release
+        state: present
+
+    - name: Install NGINX
+      yum:
+        name: nginx
+        state: present
+
+    - name: Start and enable NGINX service
+      systemd:
+        name: nginx
+        state: started
+        enabled: yes
+
+    #- name: Create a custom NGINX configuration file
+    #  copy:
+    #    dest: /etc/nginx/conf.d/custom.conf
+    #    content: |
+    #      server {
+    #        listen 80;
+    #        server_name example.com;
