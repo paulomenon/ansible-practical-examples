@@ -1,0 +1,42 @@
+---
+- name: Install MySQL on Windows (localhost)
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  collections:
+    - ansible.windows
+    - community.windows
+
+  tasks:
+    - name: Ensure Chocolatey is installed
+      win_chocolatey:
+        state: present
+
+    - name: Install MySQL using Chocolatey
+      win_chocolatey:
+        name: mysql
+        state: present
+
+    - name: Start MySQL service
+      win_service:
+        name: mysql
+        start_mode: auto
+        state: started  
+    - name: Ensure MySQL is running
+      win_shell: |
+        $ErrorActionPreference = 'Stop'
+        $mysqlStatus = Get-Service -Name mysql -ErrorAction SilentlyContinue
+        if ($mysqlStatus -eq $null) {
+          Write-Error "MySQL service is not installed."
+        } elseif ($mysqlStatus.Status -ne 'Running') {
+          Start-Service -Name mysql
+          Write-Output "MySQL service started successfully."
+        } else {
+          Write-Output "MySQL service is already running."
+        } 
+      register: mysql_status
+
+    - name: Display MySQL service status
+      debug:
+        msg: "{{ mysql_status.stdout }}"

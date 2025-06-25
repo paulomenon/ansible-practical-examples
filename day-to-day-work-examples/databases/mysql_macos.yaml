@@ -1,0 +1,43 @@
+---
+- name: Install MySQL on macOS (localhost)
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  collections:
+    - community.general
+
+  tasks:
+    - name: Install MySQL via Homebrew
+      community.general.homebrew:
+        name: mysql
+        state: present
+
+    - name: Start MySQL using Homebrew
+      command: brew services start mysql
+      register: mysql_start
+      changed_when: "'already started' not in mysql_start.stdout"
+    
+    - name: Ensure MySQL is running
+      wait_for:
+        port: 3306
+        delay: 5
+        timeout: 30
+  
+    - name: Check if MySQL is running
+      command: mysqladmin ping
+      register: mysql_ping
+      changed_when: false
+      failed_when: "'mysqld is alive' not in mysql_ping.stdout"
+  
+    - name: Create MySQL database
+      community.mysql.mysql_db:
+        name: my_database
+        state: present
+
+    - name: Create MySQL table
+      community.mysql.mysql_query:
+        login_user: root
+        login_password: ""
+        query: "CREATE TABLE IF NOT EXISTS my_table (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) NOT NULL);"   
+   

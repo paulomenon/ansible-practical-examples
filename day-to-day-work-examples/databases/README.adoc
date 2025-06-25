@@ -1,0 +1,15 @@
+# Pre requirements
+
+Before running the examples in this directory, ensure you have the following prerequisites:
+
+- Collection `databases` installed in your Ansible environment. You can install it using the command:
+  ```bash
+  ansible-galaxy collection install community.general
+  ansible-galaxy collection install ansible.windows
+  ansible-galaxy collection install community.windows
+  ansible-galaxy collection install community.mysql
+  ansible-galaxy collection install community.postgresql
+  ansible-galaxy collection install community.mongodb
+  ansible-galaxy collection install kubernetes.core
+  ansible-galaxy collection install community.kubernetes
+  ```

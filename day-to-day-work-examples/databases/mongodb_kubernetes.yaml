@@ -1,0 +1,40 @@
+# Ensure you have the necessary collections installed:
+# ansible-galaxy collection install kubernetes.core community.kubernetes  
+# If you are using Ansible 2.9 or earlier, you may need to use the `kubernetes` collection instead of `community.kubernetes`.
+---
+- name: Install MongoDB Operator via Helm
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  collections:
+    - kubernetes.core
+    - community.kubernetes
+  
+  vars:
+    release_name: mongodb-operator
+    namespace: mongodb
+    chart_ref: bitnami/mongodb
+    chart_repo_name: bitnami
+    chart_repo_url: https://charts.bitnami.com/bitnami
+
+  tasks:
+    - name: Add Bitnami Helm repo
+      community.kubernetes.helm_repository:
+        name: "{{ chart_repo_name }}"
+        repo_url: "{{ chart_repo_url }}"
+
+    - name: Create namespace if it doesn't exist
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: "{{ namespace }}"
+        state: present
+
+    - name: Install MongoDB Operator via Helm
+      community.kubernetes.helm:
+        name: "{{ release_name }}"
+        chart_ref: "{{ chart_ref }}"
+        release_namespace: "{{ namespace }}"
+        create_namespace: false
+        wait: true

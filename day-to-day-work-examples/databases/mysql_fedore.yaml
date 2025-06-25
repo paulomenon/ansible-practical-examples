@@ -1,0 +1,20 @@
+---
+- name: Install MySQL on Fedora (localhost)
+  hosts: localhost
+  become: yes
+  connection: local
+  gather_facts: true
+
+  
+
+  tasks:
+    - name: Install MySQL server
+      dnf:
+        name: mysql-server
+        state: present
+
+    - name: Start and enable MySQL
+      systemd:
+        name: mysqld
+        state: started
+        enabled: yes
