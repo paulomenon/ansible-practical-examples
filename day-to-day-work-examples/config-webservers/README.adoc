@@ -36,5 +36,5 @@ gnixg_rhel uses a static configuration file for nginx.
 ```bash
 ansible-playbook nginx_rhel.yaml -e "nginx_port=8080"
 ```
-# This will set the nginx server to listen on port 8080 instead of the default port 80.
 
+# This will set the nginx server to listen on port 8080 instead of the default port 80.
