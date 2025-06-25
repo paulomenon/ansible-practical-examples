@@ -1,0 +1,28 @@
+---
+- name: Check a web URI and handle 404 error
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    target_url: https://example.com/nonexistent-page
+
+  tasks:
+    - name: Send GET request to the URI
+      uri:
+        url: "{{ target_url }}"
+        method: GET
+        return_content: no
+        status_code: 200,404
+      register: uri_result
+      notify: Handle 404 error
+
+    - name: Print response status
+      debug:
+        msg: "Request returned status: {{ uri_result.status }}"
+
+  handlers:
+    - name: Handle 404 error
+      when: uri_result.status == 404
+      debug:
+        msg: "❌ Server not available or link is broken (HTTP 404)"

@@ -1,0 +1,42 @@
+---
+- name: Send user data via POST request with authentication
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    api_url: "http://localhost:8080/api/users"
+    api_token: "YOUR_ACCESS_TOKEN"   # Replace with your actual token
+    user_data:
+      username: "pamenon"
+      email: "pamenon@example.com"
+
+  tasks:
+    - name: Send POST request with user data
+      uri:
+        url: "{{ api_url }}"
+        method: POST
+        headers:
+          Content-Type: "application/json"
+          Authorization: "Bearer {{ api_token }}"
+        body: "{{ user_data }}"
+        body_format: json
+        status_code: [200, 201]
+      register: post_result
+
+    - name: Check if user was created successfully
+      debug:
+        msg: "User created successfully with response: {{ post_result.json }}"
+      when: post_result.status == 201
+    
+    - name: Print "{{ api_url }}"
+      debug:
+        msg: "POST request sent to {{ api_url }} with user data: {{ user_data }}"
+         
+    - name: Print response status 
+      debug:
+        msg: "POST request returned status: {{ post_result.status }}" 
+
+    - name: Fail if user creation failed
+      fail:
+        msg: "Failed to create user. Status: {{ post_result.status }}, Response: {{ post_result.content }}"
+      when: post_result.status != 201
