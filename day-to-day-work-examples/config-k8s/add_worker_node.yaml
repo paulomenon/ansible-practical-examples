@@ -1,0 +1,53 @@
+---
+- name: Add worker nodes to Kubernetes cluster
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  collections:
+    - kubernetes.core
+
+  vars:
+    kubeconfig_path: /path/to/kubeconfig
+
+    # 🔁 List of nodes to add
+    worker_nodes:
+      - name: worker-node-1
+        ip: 192.168.1.101
+      - name: worker-node-2
+        ip: 192.168.1.102
+
+  tasks:
+    - name: Join worker node to the cluster (simulated command)
+      ansible.builtin.command: >
+        kubeadm join --token YOUR_TOKEN --discovery-token-ca-cert-hash YOUR_HASH {{ item.ip }}:6443
+      loop: "{{ worker_nodes }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when: item.ip is defined
+
+    - name: Label the new worker node (optional)
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig_path }}"
+        api_version: v1
+        kind: Node
+        name: "{{ item.name }}"
+        definition:
+          metadata:
+            labels:
+              node-role.kubernetes.io/worker: ""
+      loop: "{{ worker_nodes }}"
+      loop_control:
+        label: "{{ item.name }}"
+        
+    - name: Verify worker nodes are added
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ kubeconfig_path }}"
+        kind: Node
+      register: node_info
+
+    - name: Display worker nodes
+      ansible.builtin.debug:
+        msg: "Worker node added: {{ item.metadata.name }}"
+      loop: "{{ node_info.resources }}" 
+      when: "'worker' in item.metadata.labels"

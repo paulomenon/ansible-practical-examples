@@ -1,0 +1,23 @@
+---
+- name: Install ArgoCD operator from manifest
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Apply ArgoCD operator manifest
+      kubernetes.core.k8s:
+        state: present
+        src: argocd-operator.yaml   # Path to your full operator manifest YAML file
+
+    - name: Wait for ArgoCD operator to be ready
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        namespace: argocd-operator
+        name: argocd-operator-controller-manager
+      register: deployment_info
+
+    - name: Display deployment status
+      debug:
+        msg: "ArgoCD operator deployment status: {{ deployment_info.resources[0].status.conditions[0].type }} - {{ deployment_info.resources[0].status.conditions[0].status }}" 
+    

@@ -1,0 +1,32 @@
+---
+- name: Add groups to Kubernetes cluster
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  collections:
+    - kubernetes.core
+
+  vars:
+    namespace: default
+    groups:
+      - name: group1
+        users: ["user1", "user2"]
+      - name: group2
+        users: ["user1"]
+
+  tasks:
+    - name: Create groups in Kubernetes
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Group
+        name: "{{ item.name }}"
+        namespace: "{{ namespace }}"
+        state: present
+        definition:
+          metadata:
+            labels:
+              users: "{{ item.users | join(',') }}"
+      loop: "{{ groups }}"
+      loop_control:
+        label: "{{ item.name }}"

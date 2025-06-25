@@ -1,0 +1,29 @@
+---
+- name: Add LDAP sync configuration to Kubernetes cluster
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  collections:
+    - kubernetes.core
+
+  vars:
+    namespace: default
+    ldapsync_config:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: ldapsync-config
+        namespace: "{{ namespace }}"
+      data:
+        ldap_url: "ldaps://ldap.example.com"
+        bind_dn: "cn=admin,dc=example,dc=com"
+        bind_password: "password"
+        user_search_base: "ou=users,dc=example,dc=com"
+        group_search_base: "ou=groups,dc=example,dc=com"
+
+  tasks:
+    - name: Create LDAP sync configuration in Kubernetes
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ ldapsync_config }}"

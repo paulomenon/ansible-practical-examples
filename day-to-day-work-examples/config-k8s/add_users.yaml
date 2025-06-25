@@ -1,0 +1,32 @@
+---
+- name: Add users to Kubernetes cluster
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  collections:
+    - kubernetes.core
+
+  vars:
+    namespace: default
+    users:
+      - name: user1
+        groups: ["group1", "group2"]
+      - name: user2
+        groups: ["group2"]
+
+  tasks:
+    - name: Create users in Kubernetes
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: User
+        name: "{{ item.name }}"
+        namespace: "{{ namespace }}"
+        state: present
+        definition:
+          metadata:
+            labels:
+              groups: "{{ item.groups | join(',') }}"
+      loop: "{{ users }}"
+      loop_control:
+        label: "{{ item.name }}"

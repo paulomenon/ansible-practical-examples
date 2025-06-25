@@ -1,0 +1,43 @@
+---
+- name: Add network policies to Kubernetes cluster
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  collections:
+    - kubernetes.core
+
+  vars:
+    namespace: default
+    network_policies:
+      - name: allow-traffic-from-group1
+        pod_selector:
+          match_labels:
+            app: myapp
+        ingress:
+          - from:
+              - pod_selector:
+                  match_labels:
+                    group: group1
+      - name: deny-all-egress
+        pod_selector:
+          match_labels:
+            app: myapp
+        egress: []
+
+  tasks:
+    - name: Create network policies in Kubernetes
+      kubernetes.core.k8s:
+        api_version: networking.k8s.io/v1
+        kind: NetworkPolicy
+        name: "{{ item.name }}"
+        namespace: "{{ namespace }}"
+        state: present
+        definition:
+          spec:
+            podSelector: "{{ item.pod_selector }}"
+            ingress: "{{ item.ingress | default([]) }}"
+            egress: "{{ item.egress | default([]) }}"
+      loop: "{{ network_policies }}"
+      loop_control:
+        label: "{{ item.name }}"
