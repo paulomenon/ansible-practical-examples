@@ -76,9 +76,7 @@ These examples demonstrate practical Ansible tasks you might encounter in daily 
 
 - Configuring web servers
 - Setting up databases
-- Automating deployments
-- Deploy your application on Cloud
-- Automating Cloud set up
+- Automating Kubernetes/Openshift set up
 - Decrypt base64 content
 - Practical Jinga2 Templates
 - Security updates and patches
