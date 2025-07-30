@@ -16,5 +16,7 @@ curl -X GET http://localhost:8080/api/users/pamenon
 This will show the payload, in memory.
 
 You can change the playbook username and email run it again and test the GET
-curl -X GET http://localhost:8080/api/users/<username> 
 
+```bash
+curl -X GET http://localhost:8080/api/users/<username> 
+```
